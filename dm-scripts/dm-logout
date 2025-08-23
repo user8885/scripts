@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+    DMLOCK="slock"
+fi
+
+main () {
+  choice=$(printf "logout\nlock screen\nsuspend\nreboot\nreboot into uefi\nshut down" | \
+      awk '{print NR": "$0}' | \
+      ${DMENU} -i -l 10 -p "dm-logout" | \
+      awk -F: '{print $1}') || exit 1
+
+
+  case "${choice}" in
+      "1") loginctl terminate-user $USER ;;
+      "2") ${DMLOCK} ;;
+      "3") ${DMLOCK} & systemctl suspend ;;
+      "4") systemctl reboot ;;
+      "5") systemctl reboot --firmware-setup ;;
+      "6") systemctl poweroff ;;
+  esac
+
+}
+
+main && exit 0 || exit 1

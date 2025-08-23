@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+
+echo "Setting env variables"
+if [ -z $XBPSSRCDIR ] ; then
+    mkdir -p $HOME/.local/share/vur
+    export XBPSSRCDIR=$HOME/.local/share/vur
+fi
+
+if [ -z $VURDIR ] && [ -f $XBPSSRCDIR/xbps-src ]; then
+    mkdir -p $XBPSSRCDIR/.vur
+    export VURDIR=$XBPSSRCDIR/.vur
+    export setup=true
+fi
+
+if ! [ -f $VURDIR/pkg-list ] && [ $setup -e true ]; then
+    echo "Creating PKG list"
+    touch $VURDIR/pkg-list
+    echo """#!/usr/bin/env bash
+
+pkgs=()
+
+""" >> $VURDIR/pkg-list
+    chmod u+x $VURDIR/pkg-list
+
+    source $VURDIR/pkg-list
+fi
+
+if [ -f $VURDIR/pkg-list ]; then
+    echo "Loading PKG List"
+    source $VURDIR/pkg-list
+fi
+
+help () {
+    echo """
+'ta' to add custom template files | vur -ta <pkgname-in-srcpkgs> <path-to-template>
+'te' to edit a template
+'i' (to install/update)
+'uc' (to check updates)
+'bu' to just update the subsystem
+'bb' to setup xbps-src
+'s' to search for srcpkgs
+'h' to display this 'help' output
+
+vur <flags> <pkg>
+"""
+}
+
+cdpull () {
+    cd $XBPSSRCDIR
+    git pull
+}
+
+if [ -z $1 ] ; then
+    help
+
+elif [ $1 = "uc" ] ; then
+    cdpull
+    ./xbps-src update-check $2
+
+elif [ $1 = "bu" ] ; then
+    cdpull
+    ./xbps-src bootstrap-update
+
+elif [ $1 = "uu" ] ; then
+    cdpull
+
+    for i in $pkgs; do
+        ./xbps-src pkg $i
+    done
+
+    xi $pkgs
+
+elif [ $1 = "ta" ] ; then
+     mkdir -p $XBPSSRCDIR/srcpkgs/$2
+     mv $3 $XBPSSRCDIR/srcpkgs/$2
+
+elif [ $1 = "te" ] ; then
+    if [ -n $EDITOR ] ; then
+        $EDITOR $XBPSSRCDIR/srcpkgs/$2/template
+
+    elif [ -f "/usr/bin/vim" ] ; then
+        /usr/bin/vim $XBPSSRCDIR/srcpkgs/$2/template
+
+    elif [ -f "/usr/bin/nano" ] ; then
+        /usr/bin/nano $XBPSSRCDIR/srcpkgs/$2/template
+
+    else
+        echo "Please set your EDITOR variable"
+        echo "Cannot determine editor"
+        echo "EDITOR=/path/to/an/editor vur -te <pkg>"
+    fi
+
+elif [ $1 = "bb" ] ; then
+    git clone https://github.com/void-linux/void-packages $XBPSSRCDIR
+    cd $XBPSSRCDIR
+    ./xbps-src binary-bootstrap
+
+elif [ $1 = "s" ] ; then
+    ls -ahl $XBPSSRCDIR/srcpkgs | grep "$2"
+
+elif [ $1 = "h" ] ; then
+    help
+
+elif [ $1 = "i" ] ; then
+    if [ -d $XBPSSRCDIR/srcpkgs/$2 ] ; then
+        cdpull
+        ./xbps-src pkg $2
+        xi $2
+
+        count=0
+        pkgcount=0
+
+        for i in $pkgs; do
+            if [ $i != "$2" ]; then
+                let count++
+            fi
+        done
+
+        for i in $pkgs; do
+                let pkgcount++
+        done
+
+        if [  $count -ge $pkgcount ]; then
+            echo "pkgs+=' $2'" >> $VURDIR/pkg-list
+        fi
+
+    else
+        echo "'$2' is not avalible in the srcpkgs"
+
+    fi
+
+else
+    help
+    echo "'$1' is an invalid flag"
+
+fi
+
+exit

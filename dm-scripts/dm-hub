@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+fi
+
+dmscriptdir=${HOME}/nix/scripts/dm-scripts/ 
+declare -a options=( $(ls ${dmscriptdir}) )
+
+close_wmsg () {
+    echo "Program terminated"
+    exit 1
+}
+
+main () {
+    choice=$(printf '%s\n' "${options[@]}" | \
+        sort | \
+        awk '{print NR": "$0}' | \
+        ${DMENU} -i -l 10 -p "DM-Scripts") || close_wmsg
+
+    chosen=$(echo "${choice}" | awk -F ': ' '{print $NF}')
+
+    [ -n "${chosen}" ] && \
+        ${dmscriptdir}${chosen} || \
+        exit 1
+}
+
+main && exit 0 || exit 1

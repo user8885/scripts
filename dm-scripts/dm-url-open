@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+
+set -euo pipefail
+if [ -f "~/.config/dm-scripts/config.bash" ] ; then
+    source "~/.config/dm-scripts/config.bash"
+else
+    DMENU="dmenu"
+    DMBROWSER="xdg-open"
+fi
+
+close_wmsg () {
+  echo "Program terminated"
+  exit 1
+}
+
+main () {
+  choice=$(echo "" | ${DMENU} -i -l 10 -p "Url to open") || close_wmsg
+
+  ${DMBROWSER} "${choice}"
+}
+
+main && exit 0 || close_wmsg 

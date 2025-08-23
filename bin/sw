@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+if [ -f "$1" ]; then
+ rm -f ~/.config/wallpaper
+ 
+ ln -sf "$1" ~/.config/wallpaper
+
+ if pgrep -f Hyprland ; then
+   killall hyprpaper
+   hyprpaper & disown
+ fi
+ 
+ if pgrep -f Xorg ; then
+   if ! pgrep -f Xwayland ; then
+     feh --no-fehbg --bg-fill ~/.config/wallpaper
+   fi
+ fi
+fi
+
+exit

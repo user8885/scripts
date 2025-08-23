@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+    DMBROWSER="xdg-open" 
+fi
+
+wikidir="/usr/share/doc/arch-wiki/html/en/"
+wikidocs="$(find "${wikidir}" -iname "*.html")"
+
+main () {
+    choice=$(printf '%s\n' "${wikidocs[@]}" | \
+        awk -F '/' '{print $NF}' | \
+        sort | \
+        sed -e 's/_/ /g' -e 's/.html//g' | \
+        ${DMENU} -i -l 20 -p 'Arch Wiki Docs') || close_wmsg
+
+    [ "${choice}" ] && \
+        article=$(printf '%s\n' "${wikidir}${choice}.html" | \
+            sed 's/ /_/g') || close_wmsg && \
+            ${DMBROWSER} "${article}" || close_wmsg 
+
+}
+
+close_wmsg () {
+         echo "Program terminated" && \
+            exit 1
+}
+
+
+main && exit 0 || close_wmsg

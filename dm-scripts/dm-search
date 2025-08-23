@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+    DMBROWSER="xdg-open"
+fi
+
+# ENGINE - ENGINEURL
+options=(
+"Youtube - https://www.youtube.com/results?search_query="
+"Brave - https://search.brave.com/search?q="
+"AUR - https://aur.archlinux.org/packages?O=0&K="
+"ArchWiki - https://wiki.archlinux.org/index.php?search="
+"YugenAnime - https://yugenanime.tv/discover/?q="
+"Google - https://www.google.com/search?q="
+"Wikipedia - https://en.wikipedia.org/w/index.php?search="
+"SearxNG-CA - https://searxng.ca/search?q="
+)
+
+close_wmsg () {
+    echo "Program terminated" 
+    exit 1
+}
+
+main () {
+    # Getting the search engine desired by user
+    enginelist=$(printf '%s\n' "${options[@]}" | sort | \
+     # Print line numbers in displayed output
+     awk '{print NR": "$0}' | \
+     # Asking the engine of choice
+     ${DMENU} -i -l 10 -p 'Choose your search engine') || close_wmsg 
+
+    # Awking out the url selected
+    engineurl=$(echo "${enginelist}" | awk '{print $NF}') 
+
+    # Awking out the name of search engine
+    engine=$(echo "${enginelist}" | awk '{print $2}')
+
+    # Getting search from user
+    query=$(echo "" | ${DMENU} -i -p "Search ${engine}") || close_wmsg
+
+    # Open url""search in browser
+    $DMBROWSER "${engineurl}""${query}"
+}
+
+main && exit 0 || close_wmsg

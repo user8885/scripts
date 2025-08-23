@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+fi
+
+choice=$(ps -a -u | \
+    awk '{print $1,$2"\t"$3,$4,$10,$11}' | \
+    ${DMENU} -i -l 20 -p "Select process to kill:" || exit 1 )
+
+
+[ -n "${choice}" ] && \
+    confirm=$(printf 'Yes\nNo' | \
+    ${DMENU} -i -p "Comfirm?:" || exit 1 )
+
+[ "${confirm}" = "Yes" ] && \
+    proc="$(echo "${choice}" | awk '{print $2}')" && \
+    kill -9 "${proc}" || exit 1

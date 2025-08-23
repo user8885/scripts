@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
+else
+    DMENU="dmenu"
+    DMEDITOR="xterm -e nano"
+fi
+
+options=(
+"qtile - ${HOME}/.config/qtile/config.py"
+"qtile-colors - ${HOME}/.config/qtile/colors.py"
+"qtile-autostart - ${HOME}/.config/qtile/autostart.sh"
+"yazi - ${HOME}/.config/yazi/yazi.toml"
+"yazi-keymap - ${HOME}/.config/yazi/keymap.toml"
+"neovim - ${HOME}/.config/nvim/init.vim"
+"bashrc - ${HOME}/.bashrc"
+"oh-my-bash - ${HOME}/.config/oh-my-bash/custom/"
+"bash_profile - ${HOME}/.bash_profile"
+"picom - ${HOME}/.config/picom/picom.conf"
+"conky-qtile-dracula - ${HOME}/.config/conky/qtile/01/Dracula.conf"
+"rofi - ${HOME}/.config/rofi/config.rasi"
+"dm-scripts - ${HOME}/.config/dm-scripts/config.bash"
+"kitty - ${HOME}/.config/kitty/kitty.conf"
+"hyprland - ${HOME}/.config/hypr/hyprland.conf"
+"waybar - ${HOME}/.config/waybar/config.jsonc"
+"waybar-css - ${HOME}/.config/waybar/style.css"
+)
+
+main () {
+    # Run dmenu to get user choice
+    choice=$(printf '%s\n' "${options[@]}" | sort | awk '{print NR": "$0}' | ${DMENU} -i -l 20 -p 'Edit config')
+
+    # If the user choose something then run open config func
+    if [ -n "${choice}" ]; then
+      open_conf "${choice}" "${DMEDITOR}" 
+    else 
+      close_wmsg
+    fi
+}
+
+close_wmsg () {
+    echo "Program terminated" 
+    exit 1
+}
+
+# open the conifg in desired editor
+open_conf () {
+    cfg=$(printf '%s\n' "${1}" | awk '{print $NF}') || close_wmsg
+    ${2} "${cfg}"
+}
+
+main && exit 0 || close_wmsg
