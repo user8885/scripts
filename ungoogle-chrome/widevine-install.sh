@@ -1,30 +1,47 @@
-#!/usr/bin/env bash
+#!/bin/bash -eux
+# Replace with current Chromium version
+_chrome_ver=143.0.7499.146
 
-# Exit on error and forbid unset variables
-set -eu
+# Debian's Chromium has a patch to read libwidevinecdm.so in ~/.local/lib
+# However, in 79 and newer, you must use the WidevineCdm directory instead of
+# the libwidevinecdm.so file
+_target_dir=~/.local/lib/WidevineCdm
+_move_type=user_directory
+# To have it accessible by all users, uncomment the below instead
+#_target_dir=/usr/lib/chromium/WidevineCdm
+#_move_type=system_directory
 
-# Get latest WideVine Version by getting last line in https://dl.google.com/widevine-cdm/versions.txt
-_widevine_ver="$(wget -qO- https://dl.google.com/widevine-cdm/versions.txt | tail -n1)"
+mkdir -p /tmp/chromium_widevine
+pushd /tmp/chromium_widevine
 
-# Get the architecture of the current machine
-ARCH="$(uname -m)"
-case "$ARCH" in
-	x86_64) WIDEVINE_ARCH="x64"
-		CHROMIUM_ARCH="x64"
-		;;
+# Download deb, which has corresponding Widevine version
+# Support resuming partially downloaded (or skipping re-download) with -c flag
+wget -c https://dl.google.com/linux/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${_chrome_ver}-1_amd64.deb
+# Use below link for unstable Chrome versions
+#wget -c https://dl.google.com/linux/deb/pool/main/g/google-chrome-unstable/google-chrome-unstable_${_chrome_ver}-1_amd64.deb
 
-	*)	echo "The architecture $ARCH is not supported." >&2
-		exit 1
-		;;
-esac
+# Unpack deb
+rm -r unpack_deb || true
+mkdir unpack_deb
+ar x google-chrome-stable_${_chrome_ver}-1_amd64.deb unpack_deb
 
-# Download WideVine into a temporary file and use trap to delete it on exit
-widevine_zip="$(mktemp)"
-trap 'rm -f "${widevine_zip:?}"' EXIT
-wget -O "$widevine_zip" "https://dl.google.com/widevine-cdm/${_widevine_ver}-linux-${WIDEVINE_ARCH}.zip"
+if [[ "$_move_type" == 'shared_obj' ]]; then
+	# Move libwidevinecdm.so to target dir
+	mkdir -p $_target_dir
+	mv unpack_deb/opt/google/chrome/WidevineCdm/_platform_specific/linux_x64/libwidevinecdm.so $_target_dir
+elif [[ "$_move_type" == 'user_directory' ]]; then
+	# Move WidevineCdm to target dir owned by current user
+	rm -r $_target_dir || true
+	mv unpack_deb/opt/google/chrome/WidevineCdm $_target_dir
+elif [[ "$_move_type" == 'system_directory' ]]; then
+	# Move WidevineCdm to target dir in root-owned location
+	sudo rm -r $_target_dir || true
+	sudo mv unpack_deb/opt/google/chrome/WidevineCdm $_target_dir
+	sudo chown -R root:root $_target_dir
+else
+	printf 'ERROR: Unknown value for $_move_type: %s\n' "$_move_type"
+	exit 1
+fi
 
-# Install WideVine from zip file into UngoogledChromium
-_install_prefix="$HOME/.config/chromium/WidevineCdm/${_widevine_ver}"
-unzip -p "$widevine_zip" libwidevinecdm.so | install -Dm644 "/dev/stdin" "${_install_prefix}/_platform_specific/linux_$CHROMIUM_ARCH/libwidevinecdm.so"
-unzip -p "$widevine_zip" manifest.json     | install  -m644 "/dev/stdin" "${_install_prefix}/manifest.json"
-unzip -p "$widevine_zip" LICENSE.txt       | install  -m644 "/dev/stdin" "${_install_prefix}/LICENSE.txt"
+popd
+rm -r /tmp/chromium_widevine

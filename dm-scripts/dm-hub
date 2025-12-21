@@ -7,15 +7,15 @@ else
     DMENU="dmenu"
 fi
 
-dmscriptdir=${HOME}/nix/scripts/dm-scripts/ 
+dmscriptdir=${HOME}/scripts/dm-scripts/ 
 declare -a options=( $(ls ${dmscriptdir}) )
 
-close_wmsg () {
+close_wmsg() {
     echo "Program terminated"
     exit 1
 }
 
-main () {
+main() {
     choice=$(printf '%s\n' "${options[@]}" | \
         sort | \
         awk '{print NR": "$0}' | \
