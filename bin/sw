@@ -9,6 +9,11 @@ if [ -f "$1" ]; then
    killall hyprpaper
    hyprpaper & disown
  fi
+
+ if pgrep -f niri ; then
+	 pkill swaybg
+	 swaybg -i ~/.config/wallpaper
+ fi
  
  if pgrep -f Xorg ; then
    if ! pgrep -f Xwayland ; then
