@@ -8,7 +8,7 @@ else
     DMEDITOR="xterm -e nano"
 fi
 
-options=(
+declare -a options=(
 "qtile - ${HOME}/.config/qtile/config.py"
 "qtile-colors - ${HOME}/.config/qtile/colors.py"
 "qtile-autostart - ${HOME}/.config/qtile/autostart.sh"

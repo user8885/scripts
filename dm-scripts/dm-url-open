@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-
 set -euo pipefail
-if [ -f "~/.config/dm-scripts/config.bash" ] ; then
-    source "~/.config/dm-scripts/config.bash"
+if [ -f ~/.config/dm-scripts/config.bash ] ; then
+    source ~/.config/dm-scripts/config.bash
 else
     DMENU="dmenu"
     DMBROWSER="xdg-open"

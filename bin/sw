@@ -5,12 +5,7 @@ if [ -f "$1" ]; then
  
  ln -sf "$1" ~/.config/wallpaper
 
- if pgrep -f Hyprland ; then
-   killall hyprpaper
-   hyprpaper & disown
- fi
-
- if pgrep -f niri ; then
+ if pgrep -f Xwayland ; then
 	 pkill swaybg
 	 swaybg -i ~/.config/wallpaper
  fi

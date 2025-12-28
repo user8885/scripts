@@ -9,15 +9,15 @@ else
 fi
 
 # ENGINE - ENGINEURL
-options=(
-"Youtube - https://www.youtube.com/results?search_query="
+declare -a options=(
+"DuckDuckGo - https://duckduckgo.com/?ia=web&origin=funnel_home_searchresults&t=ftsa&q="
 "Brave - https://search.brave.com/search?q="
-"AUR - https://aur.archlinux.org/packages?O=0&K="
-"ArchWiki - https://wiki.archlinux.org/index.php?search="
-"YugenAnime - https://yugenanime.tv/discover/?q="
 "Google - https://www.google.com/search?q="
+"SearxNG - https://searx.tiekoetter.com/search?q="
+"Youtube - https://www.youtube.com/results?search_query="
 "Wikipedia - https://en.wikipedia.org/w/index.php?search="
-"SearxNG-CA - https://searxng.ca/search?q="
+"ArchWiki - https://wiki.archlinux.org/index.php?search="
+"AUR - https://aur.archlinux.org/packages?O=0&K="
 )
 
 close_wmsg () {
@@ -28,10 +28,10 @@ close_wmsg () {
 main () {
     # Getting the search engine desired by user
     enginelist=$(printf '%s\n' "${options[@]}" | sort | \
-     # Print line numbers in displayed output
-     awk '{print NR": "$0}' | \
-     # Asking the engine of choice
-     ${DMENU} -i -l 10 -p 'Choose your search engine') || close_wmsg 
+    # Print line numbers in displayed output
+    awk '{print NR": "$0}' | \
+    # Asking the engine of choice
+    ${DMENU} -i -l 10 -p 'Choose your search engine') || close_wmsg 
 
     # Awking out the url selected
     engineurl=$(echo "${enginelist}" | awk '{print $NF}') 

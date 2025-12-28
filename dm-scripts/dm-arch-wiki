@@ -9,10 +9,10 @@ else
 fi
 
 wikidir="/usr/share/doc/arch-wiki/html/en/"
-wikidocs="$(find "${wikidir}" -iname "*.html")"
+declare -a wikidocs="$(find "${wikidir}" -iname "*.html")"
 
 main () {
-    choice=$(printf '%s\n' "${wikidocs[@]}" | \
+    declare -a choice=$(printf '%s\n' "${wikidocs[@]}" | \
         awk -F '/' '{print $NF}' | \
         sort | \
         sed -e 's/_/ /g' -e 's/.html//g' | \
@@ -22,12 +22,11 @@ main () {
         article=$(printf '%s\n' "${wikidir}${choice}.html" | \
             sed 's/ /_/g') || close_wmsg && \
             ${DMBROWSER} "${article}" || close_wmsg 
-
 }
 
 close_wmsg () {
-         echo "Program terminated" && \
-            exit 1
+         echo "Program terminated" 
+         exit 1
 }
 
 
