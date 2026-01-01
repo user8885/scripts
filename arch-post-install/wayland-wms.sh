@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 
+[ -f ~/.bashrc ] && mv ~/.bashrc ~/.bashrc~
+[ -f ~/.bash_profile ] && mv ~/.bash_profile ~/.bash_profile~
+[ -f ~/.profile ] && mv ~/.profile ~/.profile~
+[ -d ~/.config ] && mv ~/.config ~/.config~
+
 cd ~
-sudo pacman -S stow
+sudo pacman -Syyu stow
 git clone https://github.com/user8885/dotfiles
 cd dotfiles && stow .
 cd ~
 
+[ -d ~/.local/bin ] && mv ~/.local/bin ~/.local/bin~
 mkdir ~/.local
 ln -sf ~/scripts/bin ~/.local/bin
 
@@ -29,17 +35,18 @@ sudo pacman --needed -S \
     hyprland xdg-desktop-portal-hyprland \
     sway xdg-desktop-portal-wlr \
     niri xdg-desktop-portal-gnome xwayland-satellite \
-    swaybg swaylock rofi-wayland \
+    swaybg swaylock swaync swayosd rofi-wayland \
     network-manager-applet blueman polkit-gnome \
     nwg-look qt6ct kvantum \
     ttf-jetbrains-mono ttf-jetbrains-mono-nerd ttf-ubuntu-font-family \
-    flatpak xdg-desktop-portal xdg-desktop-portal-gtk \
-    ghostty mpv qbittorrent imv yazi btop eza fastfetch zoxide \
-    xorg-xhost wev curl wget 
+    flatpak xdg-desktop-portal-gtk \
+    keepassxc qbittorrent ghostty mpv imv yazi btop eza fastfetch zoxide starship \
+    xorg-xhost wev wget pulsemixer
 
 paru -S floorp-bin neovim-git
 
-flatpak install flathub org.gnome.Boxes \
+flatpak install flathub \
+    org.gnome.Boxes \
     com.spotify.Client \
     com.github.tchx84.Flatseal \
     io.github.flattool.Warehouse \
@@ -51,17 +58,25 @@ cd dracula-theme-user8885
 makepkg -si
 cd..
 rm -rf dracula-theme-user8885
+git clone https://gitlab.com/dwt1/shell-color-scripts.git
+cd shell-color-scripts
+makepkg -si
+cd ..
+rm -rf shell-color-scripts
 cd ~
 
 mkdir -p ~/Pictures/wallpapers
-cd ~/Picture/wallpapers
-git clone https://github.com/w3dg/wallpapers
+cd ~/Pictures/wallpapers
+git clone https://github.com/user8885/wallpapers.git
 cd ~
 
 echo -e "Opening /etc/pacman.conf in neovim with superuser privliges \nGo to the bottom and uncomment the mulitlib repo" | less && \
   EDITOR=nvim sudoedit /etc/pacman.conf
 
-sudo pacman -Sy wine-staging
+sudo bash -c "echo \"[multilib]\nInclude = /etc/pacman.d/mirrorlist\" >> /etc/pacman.conf"
+
+
+sudo pacman -Syyu wine-staging
 sudo pacman -S --needed --asdeps giflib lib32-giflib gnutls lib32-gnutls v4l-utils lib32-v4l-utils libpulse \
 lib32-libpulse alsa-plugins lib32-alsa-plugins alsa-lib lib32-alsa-lib sqlite lib32-sqlite libxcomposite \
 lib32-libxcomposite ocl-icd lib32-ocl-icd libva lib32-libva gtk3 lib32-gtk3 gst-plugins-base-libs \
@@ -71,12 +86,13 @@ sudo pacman -S steam lutris gamescope gamemode mangohud
 
 echo "Maybe restart because so much shit was installed" > ~noti.tmp~ && \
 echo "But im not your dad, so do what you want" >> ~noti.tmp~ && \
+echo -e "\n\n" >> ~noti.tmp~ && \
 echo "type 'hyprland' to launch hyprland... uHdUh" >> ~noti.tmp~ && \
 echo "or type 'sway' ..." >> ~noti.tmp~ && \
-echo "or type 'niri --session' yeah its written in rust so you know its 'special'" >> ~noti.tmp~ && \
+echo "or type 'niri --session'" >> ~noti.tmp~ && \
 echo -e "\n\n" >> ~noti.tmp~ && \
-echo "This file will be deleted after you close deleted SO READ IT" >> ~noti.tmp~ && \
-echo "Oh yeah to close press 'q'" >> ~noti.tmp~ && \
+echo "This file will be deleted after you close, SO READ IT!" >> ~noti.tmp~ && \
+echo "Oh yeah, to close press 'q'" >> ~noti.tmp~ && \
 less ~noti.tmp~
 rm ~noti.tmp~
 
