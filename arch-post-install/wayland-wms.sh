@@ -16,7 +16,7 @@ cd ~
 mkdir ~/.local
 ln -sf ~/scripts/bin ~/.local/bin
 
-sudo pacman -S pipewire pipewire-pulse pipewire-jack wireplumber pulsemixer
+sudo pacman --noconfirm -S pipewire pipewire-pulse pipewire-jack wireplumber pulsemixer
 systemctl --user enable --now pipewire
 systemctl --user enable --now pipewire-pulse
 systemctl --user enable --now wireplumber
@@ -42,7 +42,7 @@ sudo pacman --needed --noconfirm -S \
     noto-fonts ttf-noto-nerd ttf-jetbrains-mono-nerd \
     flatpak xdg-desktop-portal-gtk \
     keepassxc qbittorrent ghostty mpv imv yazi btop eza fastfetch zoxide starship \
-    xorg-xhost wev wget pulsemixer less man-db
+    xorg-xhost wev wget pulsemixer less man-db bash-completion xclip wl-clipboard
 
 # Some additional fonts
 # sudo pacman --needed --noconfirm -S ttf-jetbrains-mono ttf-ubuntu-font-family
@@ -50,7 +50,9 @@ sudo pacman --needed --noconfirm -S \
 sudo systemctl enable --now cronie.service
 sudo systemctl enable --now bluetooth.service
 
-paru -S floorp-bin neovim-git mullvad-vpn-bin
+paru -S floorp-bin 
+paru -S neovim-git 
+paru -S mullvad-vpn-bin
 
 flatpak install --noninteractive flathub \
     org.gnome.Boxes \
@@ -59,6 +61,7 @@ flatpak install --noninteractive flathub \
     io.github.flattool.Warehouse \
     com.vysp3r.ProtonPlus
 
+cd ~
 git clone https://github.com/user8885/dracula-theme-user8885
 cd dracula-theme-user8885
 makepkg -si
@@ -93,19 +96,7 @@ echo -e "\nFor Nvidia see the arch wiki page to install your drivers :|"
 echo -e "https://wiki.archlinux.org/title/NVIDIA"
 echo -e "\nBut if you have Nvidia GTX 16xx+ (i think) then you should be able to use -"
 echo -e "nvidia-utils && lib32-nvidia-utils - and then after install install nvidia-open or nvidia-open-lts"
-sleep 2
+sleep 3
 sudo pacman -S --needed steam lutris gamescope gamemode mangohud
 
-echo "Maybe restart because so much shit was installed" > ~noti.tmp~ && \
-echo "But im not your dad, so do what you want" >> ~noti.tmp~ && \
-echo -e "\n\n" >> ~noti.tmp~ && \
-echo "type 'hyprland' to launch hyprland... uHdUh" >> ~noti.tmp~ && \
-echo "or type 'sway' ..." >> ~noti.tmp~ && \
-echo "or type 'niri --session'" >> ~noti.tmp~ && \
-echo -e "\n\n" >> ~noti.tmp~ && \
-echo "This file will be deleted after you close, SO READ IT!" >> ~noti.tmp~ && \
-echo "Oh yeah, to close press 'q'" >> ~noti.tmp~ && \
-less ~noti.tmp~
-rm ~noti.tmp~
-
-bash
+echo -e "\n\n\nYay, you're done installing stuff, now reboot... or-else..."
