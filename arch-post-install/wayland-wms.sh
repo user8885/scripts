@@ -6,11 +6,11 @@
 [ -d ~/.config ] && mv ~/.config ~/.config~
 mkdir ~/.config
 
-cd ~
+mkdir -p ~/Downloads/git
+cd ~/Downloads/git
 sudo pacman --noconfirm -Syyu git stow
 git clone https://github.com/user8885/dotfiles
 cd dotfiles && stow .
-cd ~
 
 [ -d ~/.local/bin ] && mv ~/.local/bin ~/.local/bin~
 mkdir ~/.local
@@ -22,14 +22,12 @@ systemctl --user enable --now pipewire-pulse
 systemctl --user enable --now wireplumber
 
 sudo pacman -S --needed base-devel
-mkdir -p ~/Downloads
-cd ~/Downloads
+cd ~/Downloads/git
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si
 cd ..
 rm -rf paru
-cd ~
 
 sudo pacman --needed --noconfirm -S \
     timeshift grub-btrfs inotify-tools btrfs-progs \
@@ -61,26 +59,11 @@ flatpak install --noninteractive flathub \
     io.github.flattool.Warehouse \
     com.vysp3r.ProtonPlus
 
-cd ~
-git clone https://github.com/user8885/dracula-theme-user8885
-cd dracula-theme-user8885
-makepkg -si
-cd..
-rm -rf dracula-theme-user8885
-git clone https://gitlab.com/dwt1/shell-color-scripts.git
-cd shell-color-scripts
-makepkg -si
-cd ..
-rm -rf shell-color-scripts
-cd ~
+sudo bash -c "echo -e \"\n[user8885-arch-repo]\nSigLevel = Optional DatabaseOptional\nServer = https://github.com/user8885/\x24repo/raw/refs/heads/main/os/\x24arch\" >> /etc/pacman.conf"
 
-mkdir -p ~/Pictures/wallpapers
-cd ~/Pictures/wallpapers
-git clone https://github.com/user8885/wallpapers.git
-cd ~
+sudo pacman -S --noconfirm shell-color-scripts dracula-theme-user8885-git
 
 sudo bash -c "echo -e \"\n[multilib]\nInclude = /etc/pacman.d/mirrorlist\" >> /etc/pacman.conf"
-
 
 sudo pacman -Syyu --noconfirm wine-staging
 sudo pacman -S --noconfirm --needed --asdeps giflib lib32-giflib gnutls lib32-gnutls v4l-utils lib32-v4l-utils libpulse \
@@ -89,14 +72,15 @@ lib32-libxcomposite ocl-icd lib32-ocl-icd libva lib32-libva gtk3 lib32-gtk3 gst-
 lib32-gst-plugins-base-libs vulkan-icd-loader lib32-vulkan-icd-loader sdl2 lib32-sdl2
 
 
-echo -e "\n\nChoose the vulkan lib for your gpu..."
-echo -e "\nAMD should use - vulkan-radeon && lib32-vulkan-radeon"
-echo -e "\nIntel should use - vulkan-intel && lib32-vulkin-intel"
-echo -e "\nFor Nvidia see the arch wiki page to install your drivers :|"
-echo -e "https://wiki.archlinux.org/title/NVIDIA"
-echo -e "\nBut if you have Nvidia GTX 16xx+ (i think) then you should be able to use -"
-echo -e "nvidia-utils && lib32-nvidia-utils - and then after install install nvidia-open or nvidia-open-lts"
-sleep 3
+echo -e "\n\nChoose the vulkan lib for your gpu..." > /tmp/wayland-wms.sh~Driver-noti~
+echo -e "\nAMD should use - vulkan-radeon && lib32-vulkan-radeon" >> /tmp/wayland-wms.sh~Driver-noti~
+echo -e "\nIntel should use - vulkan-intel && lib32-vulkan-intel" >> /tmp/wayland-wms.sh~Driver-noti~
+echo -e "\nFor Nvidia see the arch wiki page to install your drivers :|" >> /tmp/wayland-wms.sh~Driver-noti~
+echo -e "https://wiki.archlinux.org/title/NVIDIA" >> /tmp/wayland-wms.sh~Driver-noti~
+echo -e "\nBut if you have Nvidia GTX 16xx+ (i think) then you should be able to use -" >> /tmp/wayland-wms.sh~Driver-noti~
+echo -e "nvidia-utils && lib32-nvidia-utils - and then afterwards, install nvidia-open or nvidia-open-lts" >> /tmp/wayland-wms.sh~Driver-noti~
+less /tmp/wayland-wms.sh~Driver-noti~
+
 sudo pacman -S --needed steam lutris gamescope gamemode mangohud
 
 echo -e "\n\n\nYay, you're done installing stuff, now reboot... or-else..."
