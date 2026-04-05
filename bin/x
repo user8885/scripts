@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # extract (almost)any compressed file
 [ -f "$1" ] && \

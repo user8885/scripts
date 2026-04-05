@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # change this variable to the theme you prefer
 layout="rounded"

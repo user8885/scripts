@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 wttrin=Parkersburg.png?u
 
@@ -10,7 +10,7 @@ clean() {
 
 clean
 wget -P ~/.cache wttr.in/${wttrin} && \
-  qimgv ~/.cache/${wttrin} || \
+  imv ~/.cache/${wttrin} || \
   notify-send "wttr-as-png.sh failed \_||_/" && \
   echo "you suck :|"
 clean
