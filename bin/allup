@@ -1,0 +1,14 @@
+#!/usr/bin/env fish
+
+clear
+echo "Please enter your sudo password"
+sudo dnf upgrade -y
+
+clear
+echo "Updateing flatpak"
+flatpak update -v -y
+
+clear
+yes | brew update
+
+exit

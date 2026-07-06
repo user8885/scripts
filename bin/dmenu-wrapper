@@ -1,0 +1,9 @@
+#!/usr/bin/env fish
+
+# change this variable to the theme you prefer
+set layout "rounded"
+set theme_dir "~/.config/rofi/layouts/$layout.rasi"
+
+rofi \
+    -dmenu \
+    -theme $theme_dir

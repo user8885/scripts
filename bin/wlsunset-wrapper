@@ -1,0 +1,12 @@
+#!/usr/bin/env fish
+
+set sun (pgrep wlsunset)
+
+if test -n $sun
+    pkill wlsunset
+end
+
+wlsunset -T 6500 -t 4600 -S 06:30 -s 20:30 &
+
+disown
+exit

@@ -1,0 +1,13 @@
+#!/usr/bin/env fish
+
+# change this variable to the theme you prefer
+set _layout "rounded"
+set _term $MY_TERM
+set _theme_dir ~/.config/rofi/layouts/$_layout.rasi
+
+rofi \
+    -show drun \
+    -show-icons \
+    -terminal $_term \
+    -kb-cancel Escape \
+    -theme $_theme_dir

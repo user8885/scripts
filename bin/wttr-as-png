@@ -1,0 +1,23 @@
+#!/usr/bin/env fish
+
+set _wttrin_dir /tmp/
+set _wttrin_file "Parkersburg.png?u"
+set _wttrin_file_path $_wttrin_dir/$_wttrin_file
+
+function clean
+    if test -f $_wttrin_file_path 
+        rm $_wttrin_file_path
+    end
+end
+
+function fail
+    echo "wttr-as-png failed \_||_/"
+end
+
+clean
+wget -P $_wttrin_dir "wttr.in/$_wttrin_file" && \
+    xdg-open $_wttrin_file_path || \
+    fail
+
+clean
+exit

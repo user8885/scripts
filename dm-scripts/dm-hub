@@ -1,31 +1,26 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
 
-set -euo pipefail
-if [ -f ~/.config/dm-scripts/config.bash ] ; then
-    source ~/.config/dm-scripts/config.bash
+if test -f ~/.config/dm-scripts/config.fish
+    source ~/.config/dm-scripts/config.fish
 else
-    DMENU="dmenu"
-fi
+   set _dmenu "dmenu"
+end
 
-dmscriptdir=${HOME}/scripts/dm-scripts/ 
-declare -a options=( $(ls ${dmscriptdir}) )
+set _dmscriptdir $HOME/.local/scripts/dm-scripts/ 
+set _options (ls $_dmscriptdir)
 
-close_wmsg() {
-    echo "Program terminated"
+set choice (printf '%s\n' $_options | \
+    sort | \
+    awk '{print NR": "$0}' | \
+    $_dmenu -i -l 10 -p "DM-Scripts") || exit 1
+
+set _chosen (echo "$choice" | awk -F ': ' '{print $NF}')
+
+if test -n $_chosen 
+    $_dmscriptdir$_chosen &
+else
     exit 1
-}
+end
 
-main() {
-    choice=$(printf '%s\n' "${options[@]}" | \
-        sort | \
-        awk '{print NR": "$0}' | \
-        ${DMENU} -i -l 10 -p "DM-Scripts") || close_wmsg
-
-    chosen=$(echo "${choice}" | awk -F ': ' '{print $NF}')
-
-    [ -n "${chosen}" ] && \
-        ${dmscriptdir}${chosen} || \
-        exit 1
-}
-
-main && exit 0 || exit 1
+disown
+exit 0

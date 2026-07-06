@@ -1,29 +1,33 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
 
-set -euo pipefail
-if [ -f ~/.config/dm-scripts/config.bash ] ; then
-    source ~/.config/dm-scripts/config.bash
+if test -f ~/.config/dm-scripts/config.fish
+    source ~/.config/dm-scripts/config.fish
 else
-    DMENU="dmenu"
-    DMLOCK="slock"
-fi
+    set _dmenu "dmenu"
+    set _dmlock "slock"
+end
 
-main () {
-  choice=$(printf "logout\nlock screen\nsuspend\nreboot\nreboot into uefi\nshut down" | \
-      awk '{print NR": "$0}' | \
-      ${DMENU} -i -l 10 -p "dm-logout" | \
-      awk -F: '{print $1}') || exit 1
+set _choice (printf "logout\nlock screen\nsuspend\nreboot\nreboot into uefi\nshut down" | \
+    awk '{print NR": "$0}' | \
+    $_dmenu -i -l 10 -p "dm-logout" | \
+    awk -F: '{print $1}') || exit 1
 
 
-  case "${choice}" in
-      "1") loginctl terminate-user $USER ;;
-      "2") ${DMLOCK} ;;
-      "3") ${DMLOCK} & systemctl suspend ;;
-      "4") systemctl reboot ;;
-      "5") systemctl reboot --firmware-setup ;;
-      "6") systemctl poweroff ;;
-  esac
+switch $_choice 
+    case "1"
+        loginctl terminate-user $USER
+    case "2"
+        $_dmlock
+    case "3" 
+        $_dmlock & systemctl suspend
+    case"4" 
+        systemctl reboot
+    case "5" 
+        systemctl reboot --firmware-setup
+    case "6"
+        systemctl poweroff
+end
 
-}
 
-main && exit 0 || exit 1
+disown
+exit 0

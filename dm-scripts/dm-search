@@ -1,49 +1,33 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
 
-set -euo pipefail
-if [ -f ~/.config/dm-scripts/config.bash ] ; then
-    source ~/.config/dm-scripts/config.bash
+if test -f ~/.config/dm-scripts/config.fish
+    source ~/.config/dm-scripts/config.fish
 else
-    DMENU="dmenu"
-    DMBROWSER="xdg-open"
-fi
+    set _dmenu "dmenu"
+    set _dmbrowser "xdg-open"
+end
 
 # ENGINE - ENGINEURL
-declare -a options=(
-"DuckDuckGo - https://duckduckgo.com/?ia=web&origin=funnel_home_searchresults&t=ftsa&q="
-"Brave - https://search.brave.com/search?q="
-"Google - https://www.google.com/search?q="
-"SearxNG - https://searx.tiekoetter.com/search?q="
-"Youtube - https://www.youtube.com/results?search_query="
-"Wikipedia - https://en.wikipedia.org/w/index.php?search="
-"ArchWiki - https://wiki.archlinux.org/index.php?search="
-"AUR - https://aur.archlinux.org/packages?O=0&K="
-)
+set _options \
+    "DuckDuckGo - https://duckduckgo.com/?ia=web&origin=funnel_home_searchresults&t=ftsa&q=" \
+    "Brave - https://search.brave.com/search?q=" \
+    "Google - https://www.google.com/search?q=" \
+    "SearxNG - https://searx.tiekoetter.com/search?q=" \
+    "Youtube - https://www.youtube.com/results?search_query=" \
+    "Wikipedia - https://en.wikipedia.org/w/index.php?search=" \
+    "ArchWiki - https://wiki.archlinux.org/index.php?search=" \
+    "AUR - https://aur.archlinux.org/packages?O=0&K=" \
+    "Startpage - https://www.startpage.com/sp/search?query="
 
-close_wmsg () {
-    echo "Program terminated" 
-    exit 1
-}
-
-main () {
-    # Getting the search engine desired by user
-    enginelist=$(printf '%s\n' "${options[@]}" | sort | \
-    # Print line numbers in displayed output
+set _enginelist (for _i in $_options; echo $_i; end | sort | \
     awk '{print NR": "$0}' | \
-    # Asking the engine of choice
-    ${DMENU} -i -l 10 -p 'Choose your search engine') || close_wmsg 
+    $_dmenu -i -l 10 -p 'Choose your search engine' || exit 1 )
 
-    # Awking out the url selected
-    engineurl=$(echo "${enginelist}" | awk '{print $NF}') 
+set _engineurl (echo "$_enginelist" | awk '{print $NF}') 
+set _engine (echo "$_enginelist" | awk '{print $2}')
+set _query (echo "" | $_dmenu -i -p "Search $_engine") || exit 1
 
-    # Awking out the name of search engine
-    engine=$(echo "${enginelist}" | awk '{print $2}')
+$_dmbrowser "$_engineurl$_query" & 
 
-    # Getting search from user
-    query=$(echo "" | ${DMENU} -i -p "Search ${engine}") || close_wmsg
-
-    # Open url""search in browser
-    $DMBROWSER "${engineurl}""${query}"
-}
-
-main && exit 0 || close_wmsg
+disown
+exit 0

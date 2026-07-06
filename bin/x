@@ -1,22 +1,39 @@
-#!/bin/sh
+#!/usr/bin/env fish
 
 # extract (almost)any compressed file
-[ -f "$1" ] && \
-case $1 in
-  *.tar.bz2)   tar xjf $1   ;;
-  *.tar.gz)    tar xzf $1   ;;
-  *.bz2)       bunzip2 $1   ;;
-  *.rar)       unrar x $1   ;;
-  *.gz)        gunzip $1    ;;
-  *.tar)       tar xf $1    ;;
-  *.tbz2)      tar xjf $1   ;;
-  *.tgz)       tar xzf $1   ;;
-  *.zip)       unzip $1     ;;
-  *.Z)         uncompress $1;;
-  *.7z)        7z x $1      ;;
-  *.deb)       ar x $1      ;;
-  *.tar.xz)    tar xf $1    ;;
-  *.tar.zst)   unzstd $1    ;;
-  *)           echo "'$1' cannot be extracted via x" ;;
-esac || \
-echo "'$1' is not a valid file"
+if test -f $argv
+    switch $argv
+        case "*.tar.bz2"
+            tar xjf $argv
+        case "*.tar.gz"
+            tar xzf $argv
+        case "*.bz2"
+            bunzip2 $argv
+        case "*.rar"
+            unrar x $argv
+        case "*.gz"
+            gunzip $argv
+        case "*.tar"
+            tar xf $argv
+        case "*.tbz2"
+            tar xjf $argv
+        case "*.tgz"
+            tar xzf $argv
+        case "*.zip"
+            unzip $argv
+        case "*.Z"
+            uncompress $argv
+        case "*.7z"
+            7z x $argv
+        case "*.deb"
+            ar x $argv
+        case "*.tar.xz"
+            tar xf $argv
+        case "*.tar.zst"
+            unzstd $argv
+        case "*"
+            echo "'$argv' cannot be extracted via x"
+    end
+else
+    echo "'$argv' is not a valid file"
+end
