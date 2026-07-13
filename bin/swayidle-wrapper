@@ -1,0 +1,9 @@
+#!/usr/bin/env fish
+
+swayidle -w \
+         timeout 300 'swaylock -f -l -i ~/.config/wallpaper' \
+         timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+         before-sleep 'swaylock -f -l -i ~/.config/wallpaper' &
+
+disown
+exit
